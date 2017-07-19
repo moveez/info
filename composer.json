@@ -1,10 +1,10 @@
 {
-    "name": "moveez/lib",
+    "name": "moveez/info",
     "description": "Library for retrieving film and tv information from Net",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "moveez\\lib\\": ""
+            "moveez\\info\\": ""
         }
     },
     "require": {
