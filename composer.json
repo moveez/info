@@ -1,0 +1,16 @@
+{
+    "name": "moveez/lib",
+    "description": "Library for retrieving film and tv information from Net",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "moveez\\lib\\": ""
+        }
+    },
+    "require": {
+    },
+    "require-dev": {
+    },
+    "scripts": {
+    }
+}
