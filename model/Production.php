@@ -18,7 +18,6 @@ class Production extends BasicModel
     static public function byTitle($title)
     {
         $bean = null;
-        echo "Ttle".$title;
         if (!empty($title)) {
             $bean = R::findOneOrDispense("production", "title=?",
                 array($title));
