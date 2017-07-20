@@ -13,16 +13,18 @@ use app\service\R;
 class PersonDirector extends Person
 {
 
+    public static $TABLE = "director";
+
     static public function byTitle($title)
     {
-        $director = null;
+        $bean = null;
         if (!empty($title)) {
             $title = strip_tags($title);
             $person = R::findOneOrDispense("person", "title=?", array($title));
             $person->title = $title;
-            $director = R::dispense("director");
-            $director->person = $person;
+            $bean = R::dispense("director");
+            $bean->person = $person;
         }
-        return new PersonDirector($director);
+        return new PersonDirector($bean->id, $bean);
     }
 }

@@ -13,6 +13,8 @@ use app\service\R;
 class Country extends BasicModel
 {
 
+    public static $TABLE = "country";
+
     static public function byTitle($title)
     {
         $bean = null;
@@ -20,6 +22,6 @@ class Country extends BasicModel
             $bean = R::findOneOrDispense("country", "title=?", array($title));
             $bean->title = $title;
         }
-        return new Country($bean);
+        return new Country($bean->id, $bean);
     }
 }

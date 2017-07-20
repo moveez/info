@@ -12,18 +12,19 @@ use app\service\R;
 
 class PersonActor extends Person
 {
+    public static $TABLE = "actor";
 
     static public function byTitle($title, $role = null)
     {
-        $actor = null;
+        $bean = null;
         if (!empty($title)) {
             $title = strip_tags($title);
-            $person = R::findOneOrDispense("person", "title=?", array($title));
+            $person = R::findOneOrDispense(Person::$TABLE, "title=?", array($title));
             $person->title = $title;
-            $actor = R::dispense("actor");
-            $actor->person = $person;
-            $actor->role = $role;
+            $bean = R::dispense(self::$TABLE);
+            $bean->person = $person;
+            $bean->role = $role;
         }
-        return new PersonActor($actor);
+        return new PersonActor($bean->id, $bean);
     }
 }

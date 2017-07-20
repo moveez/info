@@ -10,119 +10,150 @@ namespace moveez\info\model;
 
 use app\service\R;
 
-class Movie
+class Movie extends BasicModel
 {
 
-    protected $bean = null;
+    public static $TABLE = "movie";
 
-    function __construct($id = 0)
-    {
-        if (!empty($id)) {
-            $this->bean = R::load("movie", $id);
-        }
-    }
+    /**
+     * @var \Imdb\Title
+     */
+    protected $imdbMovie = null;
 
-    function bean()
+    /**
+     * @param $imdbid
+     *
+     * @return \Imdb\Title
+     */
+    public function imdbMovie($imdbid)
     {
-        return $this->bean;
-    }
-
-    public function byImdbID($imdbid)
-    {
-        $movie = $this->bean;
-        if (empty($movie) || empty($movie->id)) {
-            $movie = R::findOne("movie", "imdbid=?", array($imdbid));
-        }
-        if (empty($movie)) {
+        if (empty($this->imdbMovie)) {
             $config = new \Imdb\Config();
             $config->cachedir = "build/imdb/";
-            $ImdbMovie = new \Imdb\Title($imdbid, $config);
-            //exit();
-            $movie = R::dispense("movie");
-            $movie->title = $ImdbMovie->title();
-            $movie->titleorg = $ImdbMovie->orig_title();
-            $movie->cover = $ImdbMovie->photo();
-            $movie->year = $ImdbMovie->year();
-            $movie->plotoutline = $ImdbMovie->plotoutline();
+            $this->imdbMovie = new \Imdb\Title($imdbid, $config);
+        }
+        return $this->imdbMovie;
+    }
+
+    public function fetchImdb($imdbid, $fetchDeep = false)
+    {
+        $bean = $this->bean;
+
+        if (empty($bean)) {
+            $bean = R::findOne("movie", "imdbid=?", array($imdbid));
+        }
+
+        if (empty($bean)) {
+            $bean = R::dispense("movie");
+
+            $config = new \Imdb\Config();
+            $config->cachedir = "build/imdb/";
+            $ImdbMovie = $this->imdbMovie($imdbid);
+
+            $bean->imdbid = $imdbid;
+            $bean->title = $ImdbMovie->title();
+            $bean->titleorg = $ImdbMovie->orig_title();
+            $bean->cover = $ImdbMovie->photo();
+            $bean->year = $ImdbMovie->year();
+            $bean->plotoutline = $ImdbMovie->plotoutline();
 
             $items = $ImdbMovie->country();
             foreach ($items as $item) {
-                $movie->sharedCountry[] = Country::byTitle($item)->bean();;
+                $bean->sharedCountry[] = Country::byTitle($item)->bean();;
             }
 
             $items = $ImdbMovie->languages();
             foreach ($items as $item) {
-                $movie->sharedLang[] = Language::byTitle($item)->bean();
+                $bean->sharedLang[] = Language::byTitle($item)->bean();
             }
 
             $items = $ImdbMovie->genres();
             foreach ($items as $item) {
-                $movie->sharedGenre[] = Genre::byTitle($item)->bean();
+                $bean->sharedGenre[] = Genre::byTitle($item)->bean();
             }
 
             $items = $ImdbMovie->keywords();
             foreach ($items as $item) {
-                $movie->ownKeywordList[] = Keyword::byTitle($item)->bean();
+                $bean->ownKeywordList[] = Keyword::byTitle($item)->bean();
             }
 
             $items = $ImdbMovie->alsoknow();
             foreach ($items as $item) {
-                $movie->ownAkas[] = AkaTitle::byTitle(
-                    $movie->id, $item["title"],
+                $bean->ownAkas[] = AkaTitle::byTitle(
+                    $bean->id, $item["title"],
                     $item["country"], $item["lang"], $item["year"])
                     ->bean();
             }
 
             $items = $ImdbMovie->plot_split();
             foreach ($items as $item) {
-                $movie->ownPlot[] = Plot::byText($movie->id, $item["plot"], $item["author"]["name"])
+                $bean->ownPlot[] = Plot::byText($bean->id, $item["plot"], $item["author"]["name"])
                     ->bean();
             }
-
 
             $items = $ImdbMovie->synopsis();
             if (!empty($items)) {
-                $movie->ownSynopsis[] = Synopsis::byText($movie->id, $items)->bean();
+                $bean->ownSynopsis[] = Synopsis::byText($bean->id, $items)->bean();
             }
 
+            if ($fetchDeep) {
+                $items = $ImdbMovie->prodCompany();
+                foreach ($items as $item) {
+                    $bean->sharedProduction[] = Production::byTitle($item["name"])
+                        ->bean();
+                }
 
-            $items = $ImdbMovie->prodCompany();
-            foreach ($items as $item) {
-                $movie->sharedProduction[] = Production::byTitle($item["name"])
-                    ->bean();
+                $items = $ImdbMovie->director();
+                foreach ($items as $item) {
+                    $bean->ownDirectorList[] = PersonDirector::byTitle($item["name"])
+                        ->imdbid($item["imdb"])
+                        ->bean();
+                }
+                $items = $ImdbMovie->producer();
+                foreach ($items as $item) {
+                    $bean->ownProducerList[] = PersonProducer::byTitle($item["name"])
+                        ->imdbid($item["imdb"])
+                        ->bean();
+                }
+                $items = $ImdbMovie->writing();
+                foreach ($items as $item) {
+                    $bean->ownWriterList[] = PersonWriter::byTitle($item["name"])
+                        ->imdbid($item["imdb"])
+                        ->bean();
+                }
+                $items = $ImdbMovie->cast();
+                foreach ($items as $item) {
+                    $bean->ownActorList[] = PersonActor::byTitle($item["name"], $item["role"])
+                        ->imdbid($item["imdb"])
+                        ->bean();
+                }
             }
-
-            $items = $ImdbMovie->director();
-
-            foreach ($items as $item) {
-                $movie->ownDirectorList[] = PersonDirector::byTitle($item["name"])
-                    ->imdbid($item["imdb"])
-                    ->bean();
-            }
-            $items = $ImdbMovie->producer();
-            foreach ($items as $item) {
-                $movie->ownProducerList[] = PersonProducer::byTitle($item["name"])
-                    ->imdbid($item["imdb"])
-                    ->bean();
-            }
-            $items = $ImdbMovie->writing();
-            foreach ($items as $item) {
-                $movie->ownWriterList[] = PersonWriter::byTitle($item["name"])
-                    ->imdbid($item["imdb"])
-                    ->bean();
-            }
-            $items = $ImdbMovie->cast();
-            foreach ($items as $item) {
-                $movie->ownActorList[] = PersonActor::byTitle($item["name"], $item["role"])
-                    ->imdbid($item["imdb"])
-                    ->bean();
-            }
-
-            $movie->imdbid = $imdbid;
-            R::store($movie);
-            R::tag($movie, $ImdbMovie->keywords_all());
+            R::store($bean);
+            R::tag($bean, $ImdbMovie->keywords_all());
         }
-        $this->bean = $movie;
+        $this->bean = $bean;
+    }
+
+    public function syncImdb($fetchDeep = false)
+    {
+        if (!empty($this->bean->imdbid) && empty($this->bean->imdb_syncd)) {
+            $imdbMovie = $this->imdbMovie($this->bean->imdbid);
+            if (empty($this->bean->cover)) {
+                $this->bean->cover = $imdbMovie->photo();
+            }
+            if (empty($this->bean->year)) {
+                $this->bean->year = $imdbMovie->year();
+            }
+
+            if (empty($this->bean->rating)) {
+                $this->bean->rating = (new Rating(0, $this->bean->rating))
+                    ->imdb($imdbMovie->rating(), $imdbMovie->votes())->bean();
+            }
+
+            $this->bean->imdb_syncd = 1;
+
+            R::store($this->bean);
+        }
     }
 
 }

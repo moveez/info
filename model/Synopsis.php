@@ -13,6 +13,8 @@ use app\service\R;
 class Synopsis extends BasicModel
 {
 
+    public static $TABLE = "synopsis";
+
     static public function byText($movie_id, $text)
     {
         $bean = null;
@@ -21,6 +23,6 @@ class Synopsis extends BasicModel
                 array($text, $movie_id));
             $bean->text = $text;
         }
-        return new Synopsis($bean);
+        return new Synopsis($bean->id, $bean);
     }
 }

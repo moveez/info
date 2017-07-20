@@ -13,16 +13,18 @@ use app\service\R;
 class PersonWriter extends Person
 {
 
+    public static $TABLE = "writer";
+
     static public function byTitle($title)
     {
-        $writer = null;
+        $bean = null;
         if (!empty($title)) {
             $title = strip_tags($title);
             $person = R::findOneOrDispense("person", "title=?", array($title));
             $person->title = $title;
-            $writer = R::dispense("writer");
-            $writer->person = $person;
+            $bean = R::dispense("writer");
+            $bean->person = $person;
         }
-        return new PersonWriter($writer);
+        return new PersonWriter($bean->id, $bean);
     }
 }

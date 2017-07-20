@@ -13,6 +13,8 @@ use app\service\R;
 class Language extends BasicModel
 {
 
+    public static $TABLE = "lang";
+
     static public function byTitle($title)
     {
         $bean = null;
@@ -20,6 +22,6 @@ class Language extends BasicModel
             $bean = R::findOneOrDispense("lang", "title=?", array($title));
             $bean->title = $title;
         }
-        return new Language($bean);
+        return new Language($bean->id, $bean);
     }
 }

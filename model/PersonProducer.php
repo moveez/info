@@ -13,16 +13,18 @@ use app\service\R;
 class PersonProducer extends Person
 {
 
+    public static $TABLE = "producer";
+
     static public function byTitle($title)
     {
-        $producer = null;
+        $bean = null;
         if (!empty($title)) {
             $title = strip_tags($title);
             $person = R::findOneOrDispense("person", "title=?", array($title));
             $person->title = $title;
-            $producer = R::dispense("producer");
-            $producer->person = $person;
+            $bean = R::dispense("producer");
+            $bean->person = $person;
         }
-        return new PersonProducer($producer);
+        return new PersonProducer($bean->id, $bean);
     }
 }

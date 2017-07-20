@@ -13,6 +13,8 @@ use app\service\R;
 class Genre extends BasicModel
 {
 
+    public static $TABLE = "genre";
+
     static public function byTitle($title)
     {
         $bean = null;
@@ -20,6 +22,6 @@ class Genre extends BasicModel
             $bean = R::findOneOrDispense("genre", "title=?", array($title));
             $bean->title = $title;
         }
-        return new Genre($bean);
+        return new Genre($bean->id, $bean);
     }
 }

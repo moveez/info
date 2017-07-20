@@ -13,6 +13,8 @@ use app\service\R;
 class Plot extends BasicModel
 {
 
+    public static $TABLE = "plot";
+
     static public function byText($movie_id, $text = null, $authorname = null)
     {
         $bean = null;
@@ -22,6 +24,6 @@ class Plot extends BasicModel
             $bean->text = $text;
             $bean->authorname = $authorname;
         }
-        return new Plot($bean);
+        return new Plot($bean->id, $bean);
     }
 }

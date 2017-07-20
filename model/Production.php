@@ -13,6 +13,8 @@ use app\service\R;
 class Production extends BasicModel
 {
 
+    public static $TABLE = "production";
+
     static public function byTitle($title)
     {
         $bean = null;
@@ -22,6 +24,6 @@ class Production extends BasicModel
                 array($title));
             $bean->title = $title;
         }
-        return new Production($bean);
+        return new Production($bean->id, $bean);
     }
 }

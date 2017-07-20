@@ -12,17 +12,18 @@ use app\service\R;
 
 class Keyword extends BasicModel
 {
+    public static $TABLE = "keyword";
 
     static public function byTitle($title)
     {
-        $keyword = null;
-        if(!empty($title)){
+        $bean = null;
+        if (!empty($title)) {
             $title = strip_tags($title);
             $tag = R::findOneOrDispense("tag", "title=?", array($title));
             $tag->title = $title;
-            $keyword = R::dispense("keyword");
-            $keyword->tag = $tag;
+            $bean = R::dispense("keyword");
+            $bean->tag = $tag;
         }
-        return new Keyword($keyword);
+        return new Keyword($bean->id, $bean);
     }
 }
