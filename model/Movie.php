@@ -81,7 +81,6 @@ class Movie
 
 
             $items = $ImdbMovie->synopsis();
-            echo $items;
             if (!empty($items)) {
                 $movie->ownSynopsis[] = Synopsis::byText($movie->id, $items)->bean();
             }
@@ -94,7 +93,6 @@ class Movie
             }
 
             $items = $ImdbMovie->director();
-            print_r($items);
 
             foreach ($items as $item) {
                 $movie->ownDirectorList[] = PersonDirector::byTitle($item["name"])
