@@ -37,11 +37,7 @@ class Movie extends BasicModel
 
     public function fetchImdb($imdbid, $fetchDeep = false)
     {
-        $bean = $this->bean;
-
-        if (empty($bean)) {
-            $bean = R::findOne("movie", "imdbid=?", array($imdbid));
-        }
+        $bean = R::findOne("movie", "imdbid=?", array($imdbid));
 
         if (empty($bean)) {
             $bean = R::dispense("movie");
