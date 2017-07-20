@@ -45,9 +45,10 @@ class Movie extends BasicModel
 
         if (empty($bean)) {
             $bean = R::dispense("movie");
+        }
 
-            $config = new \Imdb\Config();
-            $config->cachedir = "build/imdb/";
+        if (empty($bean->id)) {
+
             $ImdbMovie = $this->imdbMovie($imdbid);
 
             $bean->imdbid = $imdbid;
