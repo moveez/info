@@ -44,7 +44,9 @@ class Person extends BasicModel
             }
             if (empty($this->bean->ownNicknameList)) {
                 foreach ($imdbPerson->nickname() as $item) {
-                    $this->bean->ownNicknameList[] = $item;
+                    $nickname = R::dispense("nickname");
+                    $nickname->title = $item;
+                    $this->bean->ownNicknameList[] = $nickname;
                 }
             }
             if (empty($this->bean->ownBirthList)) {
